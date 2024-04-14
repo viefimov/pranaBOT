@@ -1,16 +1,8 @@
 const TelegramApi = require("node-telegram-bot-api");
+
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 const bot = new TelegramApi(token, { polling: false });
-
-module.exports = async (req, res) => {
-  if (req.method === "POST") {
-    bot.processUpdate(req.body);
-    res.status(200).send("Webhook received");
-  } else {
-    res.status(405).send("Method Not Allowed");
-  }
-};
 
 bot.setMyCommands([
   { command: "/start", description: "Начать общение с ботом" },
@@ -43,6 +35,20 @@ const options_yoga = {
   }),
 };
 
+module.exports = async (req, res) => {
+  if (req.method === "POST") {
+    try {
+      await bot.processUpdate(req.body);
+      res.status(200).send("Webhook received");
+    } catch (error) {
+      console.error("Error processing update:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  } else {
+    res.status(405).send("Method Not Allowed");
+  }
+};
+
 bot.on("message", async (msg) => {
   console.log("Received message:", msg);
   const chatId = msg.chat.id;
@@ -51,10 +57,6 @@ bot.on("message", async (msg) => {
 
   try {
     if (text === "/start") {
-      await bot.sendSticker(
-        chatId,
-        "https://a127fb2c-de1c-4ae0-af0d-3808559ec217.selcdn.net/stickers/711/2ce/7112ce51-3cc1-42ca-8de7-62e7525dc332/192/2.webp"
-      );
       await bot.sendMessage(chatId, `Hello! ${msg.from.first_name}`, options);
     } else if (text === "/admin") {
       if (userId == adminId) {
