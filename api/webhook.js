@@ -45,7 +45,19 @@ const options_yoga = {
 };
 
 /// let allUsers = []
-
+bot.on("message", async (msg) => {
+  console.log("Received message:", msg);
+  try {
+    const chatId = msg.chat.id;
+    const text = msg.text;
+    if (text === "/start") {
+      await bot.sendMessage(chatId, "Hello!", options);
+    }
+    // Additional command handlers
+  } catch (error) {
+    console.error("Error in message handler:", error);
+  }
+});
 bot.on("message", async (msg) => {
   const userId = msg.from.id;
   const text = msg.text;
