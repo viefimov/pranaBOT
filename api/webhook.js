@@ -1,14 +1,20 @@
-const express = require("express");
-const bodyParser = require("body-parser");
 const TelegramApi = require("node-telegram-bot-api");
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const adminId = process.env.ADMIN_ID;
-const app = express();
-const port = process.env.PORT || 3000;
-const url = process.env.VERCEL_URL;
-const bot = new TelegramApi(token);
-bot.setWebHook(`https://${url}/webhook`);
-app.use(bodyParser.json());
+const bot = new TelegramApi(token, { polling: false });
+
+module.exports = async (req, res) => {
+  if (req.method === "POST") {
+    // Process the incoming update from Telegram
+    bot.processUpdate(req.body);
+    res.status(200).send("Webhook received");
+  } else {
+    // Not allowed method
+    res.status(405).send("Method Not Allowed");
+  }
+};
+
+bot.setWebHook(`https://prana-bot.vercel.app/api/webhook`);
+
 bot.setMyCommands([
   { command: "/start", description: "Начать общение с ботом" },
 ]);
@@ -39,27 +45,22 @@ const options_yoga = {
   }),
 };
 
-/// let allUsers = [];
-
-app.post("/webhook", (req, res) => {
-  console.log("Webhook received:", req.body); // Log to check if the webhook hits this route
-  res.status(200).send("Webhook received");
-});
+/// let allUsers = []
 
 bot.on("message", async (msg) => {
   const userId = msg.from.id;
   const text = msg.text;
   const chatId = msg.chat.id;
   ///if (!allUsers.includes(chatId)) {
-    ///allUsers.push(chatId);
+  ///allUsers.push(chatId);
   ///}
   if (userId == adminId) {
     if (text === "/admin") {
       await bot.sendMessage(chatId, "Вы вошли в админ панель");
     } ///else {
-      ///await allUsers.forEach((chatId) => {
-        ///bot.sendMessage(chatId, `${msg.text}`);
-      ///});
+    ///await allUsers.forEach((chatId) => {
+    ///bot.sendMessage(chatId, `${msg.text}`);
+    ///});
     ///}
   } else if (text === "/admin" && userId != adminId) {
     await bot.sendMessage(chatId, "Вы не админ");
@@ -108,7 +109,4 @@ bot.on("callback_query", async (msg) => {
   if (msg.data === "7") {
     await bot.sendMessage(chatId, "Йога 7");
   }
-});
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
 });
