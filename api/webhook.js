@@ -4,7 +4,8 @@ const { Pool } = pg;
 
 // Database pool setup
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL ,
+  connectionString:
+    "postgresql://pranadb_correctto:567599d7000dd31fd490a05393f5ff5dc0a4c183@yps.h.filess.io:5432/pranadb_correctto",
 });
 
 // Create tables in the database
