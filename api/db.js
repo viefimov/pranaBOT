@@ -1,10 +1,9 @@
-import pg from "pg";
+const pg = require("pg");
 
 const { Pool } = pg;
 
 const pool = new Pool({
-  connectionString:
-    "postgres://default:uIDcBLzHn9r2@ep-bitter-scene-a2f1zxf1.eu-central-1.aws.neon.tech:5432/verceldb?sslmode=require",
+  connectionString: process.env.POSTGRES_URL,
 });
 
 const createTables = async () => {
@@ -12,9 +11,8 @@ const createTables = async () => {
         CREATE TABLE IF NOT EXISTS users (
             id BIGINT PRIMARY KEY,
             username VARCHAR(255) NULL,
-            first_name VARCHAR(255) NULL,
-            joined_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        );
+            first_name VARCHAR(255) NULL
+        )
     `;
   try {
     await pool.query(usersTableQuery);
