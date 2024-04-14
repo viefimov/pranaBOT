@@ -5,7 +5,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 const app = express();
 const port = process.env.PORT || 3000;
-const url = process.env.WEBHOOK_URL;
+const url = process.env.VERCEL_URL;
 const bot = new TelegramApi(token);
 bot.setWebHook(`${url}/webhook`);
 app.use(bodyParser.json());
