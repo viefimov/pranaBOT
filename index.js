@@ -42,8 +42,8 @@ const options_yoga = {
 /// let allUsers = [];
 
 app.post("/webhook", (req, res) => {
-  bot.processUpdate(req.body);
-  res.sendStatus(200);
+  console.log("Webhook received:", req.body); // Log to check if the webhook hits this route
+  res.status(200).send("Webhook received");
 });
 
 bot.on("message", async (msg) => {
