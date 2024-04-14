@@ -1,8 +1,14 @@
+const express = require("express");
+const bodyParser = require("body-parser");
 const TelegramApi = require("node-telegram-bot-api");
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.adminID;
-
-const bot = new TelegramApi(token, { polling: true });
+const app = express();
+const port = process.env.PORT || 3000;
+const url = process.env.WEBHOOK_URL;
+const bot = new TelegramApi(token);
+bot.setWebHook(`${url}/webhook`);
+app.use(bodyParser.json());
 bot.setMyCommands([
   { command: "/start", description: "Начать общение с ботом" },
 ]);
@@ -34,6 +40,11 @@ const options_yoga = {
 };
 
 let allUsers = [];
+
+app.post("/webhook", (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
 
 bot.on("message", async (msg) => {
   const userId = msg.from.id;
@@ -97,4 +108,7 @@ bot.on("callback_query", async (msg) => {
   if (msg.data === "7") {
     await bot.sendMessage(chatId, "Йога 7");
   }
+});
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
