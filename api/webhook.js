@@ -65,11 +65,10 @@ bot.on("message", async (msg) => {
     await bot.sendMessage(chatId, "Вы не админ");
   }
   if (text === "/start") {
-    await bot.sendSticker(
+    await (bot.sendSticker(
       chatId,
       "https://a127fb2c-de1c-4ae0-af0d-3808559ec217.selcdn.net/stickers/711/2ce/7112ce51-3cc1-42ca-8de7-62e7525dc332/192/2.webp"
-    );
-    await bot.sendMessage(chatId, `Hello! ${msg.from.id}`, options);
+    ) && bot.sendMessage(chatId, `Hello! ${msg.from.id}`, options));
   }
 });
 bot.on("text", async (msg) => {
