@@ -3,7 +3,8 @@ import pg from "pg";
 const { Pool } = pg;
 
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL_NO_SSL,
+  connectionString:
+    "postgres://default:uIDcBLzHn9r2@ep-bitter-scene-a2f1zxf1.eu-central-1.aws.neon.tech:5432/verceldb?sslmode=require",
 });
 
 const createTables = async () => {
