@@ -1,4 +1,4 @@
-const TelegramApi = require("node-telegram-bot-api");
+
 const { Client } = require("pg");
 
 // Client configuration
@@ -9,7 +9,8 @@ const client = new Client({
   password: "567599d7000dd31fd490a05393f5ff5dc0a4c183",
   port: 5432,
 });
-
+await client.connect();
+const TelegramApi = require("node-telegram-bot-api");
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 const bot = new TelegramApi(token, { polling: false });
@@ -42,7 +43,6 @@ const options_yoga = {
 };
 
 // Establishing database connection
-client.connect();
 
 bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
@@ -100,7 +100,3 @@ bot.on("callback_query", async (msg) => {
   }
 });
 
-process.on("unhandledRejection", (reason, promise) => {
-  console.log("Unhandled Rejection at:", promise, "reason:", reason);
-  // Application specific logging, throwing an error, or other logic here
-});
