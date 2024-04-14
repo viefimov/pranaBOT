@@ -1,4 +1,3 @@
-
 const { Client } = require("pg");
 
 // Client configuration
@@ -15,7 +14,6 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 const bot = new TelegramApi(token, { polling: false });
 
-// Keyboard options for the bot
 const options = {
   reply_markup: JSON.stringify({
     keyboard: [
@@ -42,23 +40,34 @@ const options_yoga = {
   }),
 };
 
-// Establishing database connection
+module.exports = async (req, res) => {
+  if (req.method === "POST") {
+    try {
+      await bot.processUpdate(req.body);
+      res.status(200).send("Webhook received");
+    } catch (error) {
+      console.error("Error processing update:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  } else {
+    res.status(405).send("Method Not Allowed");
+  }
+};
 
 bot.on("message", async (msg) => {
+  console.log("Received message:", msg);
   const chatId = msg.chat.id;
   const text = msg.text;
   const userId = msg.from.id;
   const userName = msg.from.username || "";
   const firstName = msg.from.first_name || "";
-
   try {
     if (text === "/start") {
-      const userExists = await client.query(
-        "SELECT * FROM myschema.users WHERE id = $1",
-        [chatId]
-      );
+      const userExists = await pool.query("SELECT * FROM myschema.users WHERE id = $1", [
+        chatId,
+      ]);
       if (userExists.rows.length === 0) {
-        await client.query(
+        await pool.query(
           "INSERT INTO myschema.users (id, username, first_name) VALUES ($1, $2, $3)",
           [chatId, userName, firstName]
         );
@@ -71,7 +80,7 @@ bot.on("message", async (msg) => {
         await bot.sendMessage(chatId, "Вы не админ");
       }
     } else if (userId == adminId && !text.includes("/")) {
-      const users = await client.query("SELECT id FROM myschema.users");
+      const users = await pool.query("SELECT id FROM myschema.users");
       users.rows.forEach(async (user) => {
         await bot.sendMessage(user.id, text);
       });
@@ -84,7 +93,6 @@ bot.on("message", async (msg) => {
     }
   } catch (error) {
     console.error("Error in message handler:", error);
-    await bot.sendMessage(chatId, "An error occurred. Please try again later.");
   }
 });
 
@@ -96,7 +104,5 @@ bot.on("callback_query", async (msg) => {
     await bot.sendMessage(chatId, `Йога ${data}`);
   } catch (error) {
     console.error("Error in callback query handler:", error);
-    await bot.sendMessage(chatId, "An error occurred. Please try again later.");
   }
 });
-
