@@ -1,21 +1,43 @@
 const TelegramApi = require("node-telegram-bot-api");
+const pg = require("pg");
+const { Pool } = pg;
 
-const token = process.env.TELEGRAM_BOT_TOKEN;
-const adminId = process.env.ADMIN_ID;
-const bot = new TelegramApi(token, { polling: false });
-const db = require("./db");
+// Database pool setup
+const pool = new Pool({
+  connectionString: process.env.POSTGRES_URL,
+});
 
-db.createTables()
+// Create tables in the database
+async function createTables() {
+  const usersTableQuery = `
+        CREATE TABLE IF NOT EXISTS users (
+            id BIGINT PRIMARY KEY,
+            username VARCHAR(255) NULL,
+            first_name VARCHAR(255) NULL
+        );
+    `;
+  try {
+    await pool.query(usersTableQuery);
+    console.log("Table creation successful.");
+  } catch (err) {
+    console.error("Error creating tables:", err);
+    throw err;
+  }
+}
+
+// Initialize database tables
+createTables()
   .then(() => {
     console.log("Database initialized");
   })
   .catch((err) => {
     console.error("Failed to initialize database:", err);
   });
-bot.setMyCommands([
-  { command: "/start", description: "Начать общение с ботом" },
-  { command: "/admin", description: "Admin panel access" },
-]);
+
+const token = process.env.TELEGRAM_BOT_TOKEN;
+const adminId = process.env.ADMIN_ID;
+const bot = new TelegramApi(token, { polling: false });
+
 
 const options = {
   reply_markup: JSON.stringify({
@@ -66,11 +88,11 @@ bot.on("message", async (msg) => {
   const firstName = msg.from.first_name || "";
   try {
     if (text === "/start") {
-      const userExists = await db.query("SELECT * FROM users WHERE id = $1", [
+      const userExists = await pool.query("SELECT * FROM users WHERE id = $1", [
         chatId,
       ]);
       if (userExists.rows.length === 0) {
-        await db.query(
+        await pool.query(
           "INSERT INTO users (id, username, first_name) VALUES ($1, $2, $3)",
           [chatId, userName, firstName]
         );
@@ -83,7 +105,7 @@ bot.on("message", async (msg) => {
         await bot.sendMessage(chatId, "Вы не админ");
       }
     } else if (userId == adminId && !text.includes("/")) {
-      const users = await db.query("SELECT id FROM users");
+      const users = await pool.query("SELECT id FROM users");
       users.rows.forEach(async (user) => {
         await bot.sendMessage(user.id, text);
       });
