@@ -9,7 +9,7 @@ const client = new Client({
   password: "567599d7000dd31fd490a05393f5ff5dc0a4c183",
   port: 5432,
 });
-await client.connect();
+client.connect();
 const TelegramApi = require("node-telegram-bot-api");
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
