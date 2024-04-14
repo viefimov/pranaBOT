@@ -1,6 +1,7 @@
 const { Client } = require("pg");
+const TelegramApi = require("node-telegram-bot-api");
 
-// Client configuration
+// Setup PostgreSQL client
 const client = new Client({
   user: "pranadb_correctto",
   host: "yps.h.filess.io",
@@ -9,7 +10,7 @@ const client = new Client({
   port: 5432,
 });
 client.connect();
-const TelegramApi = require("node-telegram-bot-api");
+
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 const bot = new TelegramApi(token, { polling: false });
@@ -63,9 +64,10 @@ bot.on("message", async (msg) => {
   const firstName = msg.from.first_name || "";
   try {
     if (text === "/start") {
-      const userExists = await pool.query("SELECT * FROM myschema.users WHERE id = $1", [
-        chatId,
-      ]);
+      const userExists = await pool.query(
+        "SELECT * FROM myschema.users WHERE id = $1",
+        [chatId]
+      );
       if (userExists.rows.length === 0) {
         await pool.query(
           "INSERT INTO myschema.users (id, username, first_name) VALUES ($1, $2, $3)",
