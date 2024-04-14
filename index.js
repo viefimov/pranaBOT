@@ -39,7 +39,7 @@ const options_yoga = {
   }),
 };
 
-let allUsers = [];
+/// let allUsers = [];
 
 app.post("/webhook", (req, res) => {
   bot.processUpdate(req.body);
@@ -50,17 +50,17 @@ bot.on("message", async (msg) => {
   const userId = msg.from.id;
   const text = msg.text;
   const chatId = msg.chat.id;
-  if (!allUsers.includes(chatId)) {
-    allUsers.push(chatId);
-  }
+  ///if (!allUsers.includes(chatId)) {
+    ///allUsers.push(chatId);
+  ///}
   if (userId == adminId) {
     if (text === "/admin") {
       await bot.sendMessage(chatId, "Вы вошли в админ панель");
-    } else {
-      await allUsers.forEach((chatId) => {
-        bot.sendMessage(chatId, `${msg.text}`);
-      });
-    }
+    } ///else {
+      ///await allUsers.forEach((chatId) => {
+        ///bot.sendMessage(chatId, `${msg.text}`);
+      ///});
+    ///}
   } else if (text === "/admin" && userId != adminId) {
     await bot.sendMessage(chatId, "Вы не админ");
   }
