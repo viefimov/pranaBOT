@@ -4,8 +4,8 @@
   "description": "",
   "main": "api/webhook.js",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon api/webhook.js",
+    "start": "node api/webhook.js"
   },
   "keywords": [],
   "author": "",
