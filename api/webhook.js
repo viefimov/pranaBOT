@@ -3,7 +3,7 @@ const TelegramApi = require("node-telegram-bot-api");
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 const bot = new TelegramApi(token, { polling: false });
-const db = require("./db");
+const db = require("../db");
 
 db.createTables()
   .then(() => {
