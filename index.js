@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const url = process.env.VERCEL_URL;
 const bot = new TelegramApi(token);
-bot.setWebHook(`${url}/webhook`);
+bot.setWebHook(`https://${url}/webhook`);
 app.use(bodyParser.json());
 bot.setMyCommands([
   { command: "/start", description: "Начать общение с ботом" },
