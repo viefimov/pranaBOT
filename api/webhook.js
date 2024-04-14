@@ -14,8 +14,6 @@ module.exports = async (req, res) => {
   }
 };
 
-bot.setWebHook(`https://prana-bot.vercel.app/api/webhook`);
-
 bot.setMyCommands([
   { command: "/start", description: "Начать общение с ботом" },
 ]);
