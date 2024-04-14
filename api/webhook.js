@@ -5,17 +5,16 @@ const bot = new TelegramApi(token, { polling: false });
 
 module.exports = async (req, res) => {
   if (req.method === "POST") {
-    // Process the incoming update from Telegram
     bot.processUpdate(req.body);
     res.status(200).send("Webhook received");
   } else {
-    // Not allowed method
     res.status(405).send("Method Not Allowed");
   }
 };
 
 bot.setMyCommands([
   { command: "/start", description: "Начать общение с ботом" },
+  { command: "/admin", description: "Admin panel access" },
 ]);
 
 const options = {
@@ -44,80 +43,44 @@ const options_yoga = {
   }),
 };
 
-/// let allUsers = []
 bot.on("message", async (msg) => {
   console.log("Received message:", msg);
+  const chatId = msg.chat.id;
+  const text = msg.text;
+  const userId = msg.from.id;
+
   try {
-    const chatId = msg.chat.id;
-    const text = msg.text;
     if (text === "/start") {
-      await bot.sendMessage(chatId, "Hello!", options);
+      await bot.sendSticker(
+        chatId,
+        "https://a127fb2c-de1c-4ae0-af0d-3808559ec217.selcdn.net/stickers/711/2ce/7112ce51-3cc1-42ca-8de7-62e7525dc332/192/2.webp"
+      );
+      await bot.sendMessage(chatId, `Hello! ${msg.from.first_name}`, options);
+    } else if (text === "/admin") {
+      if (userId == adminId) {
+        await bot.sendMessage(chatId, "Вы вошли в админ панель");
+      } else {
+        await bot.sendMessage(chatId, "Вы не админ");
+      }
+    } else if (text === "О нас") {
+      await bot.sendMessage(chatId, "О нас");
+    } else if (text === "Виды йоги") {
+      await bot.sendMessage(chatId, "Виды йоги:", options_yoga);
+    } else if (text === "Популярные вопросы") {
+      await bot.sendMessage(chatId, "Популярные вопросы");
     }
-    // Additional command handlers
   } catch (error) {
     console.error("Error in message handler:", error);
   }
 });
-bot.on("message", async (msg) => {
-  const userId = msg.from.id;
-  const text = msg.text;
-  const chatId = msg.chat.id;
-  ///if (!allUsers.includes(chatId)) {
-  ///allUsers.push(chatId);
-  ///}
-  if (userId == adminId) {
-    if (text === "/admin") {
-      await bot.sendMessage(chatId, "Вы вошли в админ панель");
-    } ///else {
-    ///await allUsers.forEach((chatId) => {
-    ///bot.sendMessage(chatId, `${msg.text}`);
-    ///});
-    ///}
-  } else if (text === "/admin" && userId != adminId) {
-    await bot.sendMessage(chatId, "Вы не админ");
-  }
-  if (text === "/start") {
-    await bot.sendSticker(
-      chatId,
-      "https://a127fb2c-de1c-4ae0-af0d-3808559ec217.selcdn.net/stickers/711/2ce/7112ce51-3cc1-42ca-8de7-62e7525dc332/192/2.webp"
-    );
-    return bot.sendMessage(chatId, `Hello! ${msg.from.id}`, options);
-  }
-});
-bot.on("text", async (msg) => {
-  const text = msg.text;
-  const chatId = msg.chat.id;
-  if (text === "О нас") {
-    await bot.sendMessage(chatId, "О нас");
-  }
-  if (text === "Виды йоги") {
-    await bot.sendMessage(chatId, "Виды йоги:", options_yoga);
-  }
-  if (text === "Популярные вопросы") {
-    await bot.sendMessage(chatId, "Популярные вопросы");
-  }
-});
+
 bot.on("callback_query", async (msg) => {
   const chatId = msg.message.chat.id;
-  if (msg.data === "1") {
-    await bot.sendMessage(chatId, "Йога 1");
-  }
-  if (msg.data === "2") {
-    await bot.sendMessage(chatId, "Йога 2");
-  }
-  if (msg.data === "3") {
-    await bot.sendMessage(chatId, "Йога 3");
-  }
-  if (msg.data === "4") {
-    await bot.sendMessage(chatId, "Йога 4");
-  }
-  if (msg.data === "5") {
-    await bot.sendMessage(chatId, "Йога 5");
-  }
-  if (msg.data === "6") {
-    await bot.sendMessage(chatId, "Йога 6");
-  }
-  if (msg.data === "7") {
-    await bot.sendMessage(chatId, "Йога 7");
+  const data = msg.data;
+
+  try {
+    await bot.sendMessage(chatId, `Йога ${data}`);
+  } catch (error) {
+    console.error("Error in callback query handler:", error);
   }
 });
