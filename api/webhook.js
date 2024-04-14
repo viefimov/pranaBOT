@@ -12,7 +12,7 @@ const client = new Client({
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
-const bot = new TelegramApi(token, { polling: true });
+const bot = new TelegramApi(token, { polling: false });
 
 // Keyboard options for the bot
 const options = {
@@ -54,12 +54,12 @@ bot.on("message", async (msg) => {
   try {
     if (text === "/start") {
       const userExists = await client.query(
-        "SELECT * FROM users WHERE id = $1",
+        "SELECT * FROM myschema.users WHERE id = $1",
         [chatId]
       );
       if (userExists.rows.length === 0) {
         await client.query(
-          "INSERT INTO users (id, username, first_name) VALUES ($1, $2, $3)",
+          "INSERT INTO myschema.users (id, username, first_name) VALUES ($1, $2, $3)",
           [chatId, userName, firstName]
         );
       }
@@ -71,7 +71,7 @@ bot.on("message", async (msg) => {
         await bot.sendMessage(chatId, "Вы не админ");
       }
     } else if (userId == adminId && !text.includes("/")) {
-      const users = await client.query("SELECT id FROM users");
+      const users = await client.query("SELECT id FROM myschema.users");
       users.rows.forEach(async (user) => {
         await bot.sendMessage(user.id, text);
       });
