@@ -3,7 +3,15 @@ const TelegramApi = require("node-telegram-bot-api");
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
 const bot = new TelegramApi(token, { polling: false });
+const db = require("./db");
 
+db.createTables()
+  .then(() => {
+    console.log("Database initialized");
+  })
+  .catch((err) => {
+    console.error("Failed to initialize database:", err);
+  });
 bot.setMyCommands([
   { command: "/start", description: "Начать общение с ботом" },
   { command: "/admin", description: "Admin panel access" },
@@ -54,9 +62,19 @@ bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
   const userId = msg.from.id;
-
+  const userName = msg.from.username || "";
+  const firstName = msg.from.first_name || "";
   try {
     if (text === "/start") {
+      const userExists = await db.query("SELECT * FROM users WHERE id = $1", [
+        chatId,
+      ]);
+      if (userExists.rows.length === 0) {
+        await db.query(
+          "INSERT INTO users (id, username, first_name) VALUES ($1, $2, $3)",
+          [chatId, userName, firstName]
+        );
+      }
       await bot.sendMessage(chatId, `Hello! ${msg.from.first_name}`, options);
     } else if (text === "/admin") {
       if (userId == adminId) {
@@ -64,6 +82,11 @@ bot.on("message", async (msg) => {
       } else {
         await bot.sendMessage(chatId, "Вы не админ");
       }
+    } else if (userId == adminId && !text.includes("/")) {
+      const users = await db.query("SELECT id FROM users");
+      users.rows.forEach(async (user) => {
+        await bot.sendMessage(user.id, text);
+      });
     } else if (text === "О нас") {
       await bot.sendMessage(chatId, "О нас");
     } else if (text === "Виды йоги") {
