@@ -39,7 +39,7 @@ bot.on("message", async (msg) => {
   const userId = msg.from.id;
   const userName = msg.from.username || "";
   const firstName = msg.from.first_name || "";
-  if (!users.includex(chatId)) {
+  if (!users.includes(chatId)) {
     users.push(chatId);
   }
   try {
