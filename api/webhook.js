@@ -64,12 +64,12 @@ bot.on("message", async (msg) => {
   const firstName = msg.from.first_name || "";
   try {
     if (text === "/start") {
-      const userExists = await pool.query(
+      const userExists = await client.query(
         "SELECT * FROM myschema.users WHERE id = $1",
         [chatId]
       );
       if (userExists.rows.length === 0) {
-        await pool.query(
+        await client.query(
           "INSERT INTO myschema.users (id, username, first_name) VALUES ($1, $2, $3)",
           [chatId, userName, firstName]
         );
@@ -82,7 +82,7 @@ bot.on("message", async (msg) => {
         await bot.sendMessage(chatId, "Вы не админ");
       }
     } else if (userId == adminId && !text.includes("/")) {
-      const users = await pool.query("SELECT id FROM myschema.users");
+      const users = await client.query("SELECT id FROM myschema.users");
       users.rows.forEach(async (user) => {
         await bot.sendMessage(user.id, text);
       });
