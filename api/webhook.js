@@ -1,15 +1,8 @@
-const { Client } = require("pg");
+const { connectClient } = require("../db.js");
 const TelegramApi = require("node-telegram-bot-api");
 
 // Setup PostgreSQL client
-const client = new Client({
-  user: "pranadb_correctto",
-  host: "yps.h.filess.io",
-  database: "pranadb_correctto",
-  password: "567599d7000dd31fd490a05393f5ff5dc0a4c183",
-  port: 5432,
-});
-client.connect();
+
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const adminId = process.env.ADMIN_ID;
@@ -42,6 +35,7 @@ const options_yoga = {
 };
 
 module.exports = async (req, res) => {
+    const client = connectClient();
   if (req.method === "POST") {
     try {
       bot.processUpdate(req.body);
@@ -49,6 +43,8 @@ module.exports = async (req, res) => {
     } catch (error) {
       console.error("Error processing update:", error);
       res.status(500).send("Internal Server Error");
+    } finally {
+      await client.end(); // Disconnect each time to prevent connection leaks
     }
   } else {
     res.status(405).send("Method Not Allowed");
