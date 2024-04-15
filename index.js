@@ -51,7 +51,7 @@ bot.on("message", async (msg) => {
       } else {
         await bot.sendMessage(chatId, "Вы не админ");
       }
-    } else if (userId == adminId && !text.includes("/")) {
+    } else if (userId == adminId && !text.includes("/") & !text.includes("Виды")) {}
       users.forEach(async (user) => {
         await bot.sendMessage(user, text);
       });
