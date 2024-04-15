@@ -1,6 +1,6 @@
 const TelegramApi = require("node-telegram-bot-api");
 
-const token = "6896940302:AAFPFHRSdzkXQ-cm_rQG4EKU17r5zx2cemQ";
+const token = `6896940302:AAFPFHRSdzkXQ-cm_rQG4EKU17r5zx2cemQ`;
 const adminId = 1349073268;
 const bot = new TelegramApi(token);
 
@@ -33,7 +33,6 @@ const options_yoga = {
 let users = [];
 
 bot.on("message", async (msg) => {
-  const client = connectClient();
   console.log("Received message:", msg);
   const chatId = msg.chat.id;
   const text = msg.text;
@@ -53,7 +52,7 @@ bot.on("message", async (msg) => {
         await bot.sendMessage(chatId, "Вы не админ");
       }
     } else if (userId == adminId && !text.includes("/")) {
-      users.rows.forEach(async (user) => {
+      users.forEach(async (user) => {
         await bot.sendMessage(user.id, text);
       });
     } else if (text === "О нас") {
@@ -65,8 +64,6 @@ bot.on("message", async (msg) => {
     }
   } catch (error) {
     console.error("Error in message handler:", error);
-  } finally {
-    await client.end(); // Ensure to close the database connection
   }
 });
 
