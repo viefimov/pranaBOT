@@ -35,7 +35,6 @@ const options_yoga = {
 };
 
 module.exports = async (req, res) => {
-    const client = connectClient();
   if (req.method === "POST") {
     try {
       bot.processUpdate(req.body);
@@ -43,8 +42,6 @@ module.exports = async (req, res) => {
     } catch (error) {
       console.error("Error processing update:", error);
       res.status(500).send("Internal Server Error");
-    } finally {
-      await client.end(); // Disconnect each time to prevent connection leaks
     }
   } else {
     res.status(405).send("Method Not Allowed");
@@ -52,6 +49,7 @@ module.exports = async (req, res) => {
 };
 
 bot.on("message", async (msg) => {
+    const client = connectClient();
   console.log("Received message:", msg);
   const chatId = msg.chat.id;
   const text = msg.text;
@@ -91,6 +89,8 @@ bot.on("message", async (msg) => {
     }
   } catch (error) {
     console.error("Error in message handler:", error);
+  } finally {
+    await client.end(); // Ensure to close the database connection
   }
 });
 
