@@ -2,7 +2,7 @@
   "name": "tg_bot",
   "version": "1.0.0",
   "description": "",
-  "main": "api/webhook.js",
+  "main": "index.js",
   "scripts": {
     "dev": "nodemon api/webhook.js",
     "start": "node api/webhook.js"
