@@ -44,7 +44,7 @@ const options_yoga = {
 module.exports = async (req, res) => {
   if (req.method === "POST") {
     try {
-      await bot.processUpdate(req.body);
+      bot.processUpdate(req.body);
       res.status(200).send("Webhook received");
     } catch (error) {
       console.error("Error processing update:", error);
