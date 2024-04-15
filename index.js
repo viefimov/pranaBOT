@@ -1,12 +1,8 @@
-const { connectClient } = require("../db.js");
 const TelegramApi = require("node-telegram-bot-api");
 
-// Setup PostgreSQL client
-
-
-const token = process.env.TELEGRAM_BOT_TOKEN;
-const adminId = process.env.ADMIN_ID;
-const bot = new TelegramApi(token, { polling: false });
+const token = "6896940302:AAFPFHRSdzkXQ-cm_rQG4EKU17r5zx2cemQ";
+const adminId = 1349073268;
+const bot = new TelegramApi(token);
 
 const options = {
   reply_markup: JSON.stringify({
@@ -34,41 +30,22 @@ const options_yoga = {
   }),
 };
 
-module.exports = async (req, res) => {
-  if (req.method === "POST") {
-    try {
-      bot.processUpdate(req.body);
-      res.status(200).send("Webhook received");
-    } catch (error) {
-      console.error("Error processing update:", error);
-      res.status(500).send("Internal Server Error");
-    }
-  } else {
-    res.status(405).send("Method Not Allowed");
-  }
-};
+let users = [];
 
 bot.on("message", async (msg) => {
-    const client = connectClient();
+  const client = connectClient();
   console.log("Received message:", msg);
   const chatId = msg.chat.id;
   const text = msg.text;
   const userId = msg.from.id;
   const userName = msg.from.username || "";
   const firstName = msg.from.first_name || "";
+  if (!users.includex(chatId)) {
+    users.push(chatId);
+  }
   try {
     if (text === "/start") {
-      const userExists = await client.query(
-        "SELECT * FROM myschema.users WHERE id = $1",
-        [chatId]
-      );
-      if (userExists.rows.length === 0) {
-        await client.query(
-          "INSERT INTO myschema.users (id, username, first_name) VALUES ($1, $2, $3)",
-          [chatId, userName, firstName]
-        );
-      }
-      await bot.sendMessage(chatId, `Hello! ${msg.from.first_name}`, options);
+      await bot.sendMessage(chatId, `Hello, ${firstName}!`, options);
     } else if (text === "/admin") {
       if (userId == adminId) {
         await bot.sendMessage(chatId, "Вы вошли в админ панель");
@@ -76,7 +53,6 @@ bot.on("message", async (msg) => {
         await bot.sendMessage(chatId, "Вы не админ");
       }
     } else if (userId == adminId && !text.includes("/")) {
-      const users = await client.query("SELECT id FROM myschema.users");
       users.rows.forEach(async (user) => {
         await bot.sendMessage(user.id, text);
       });
