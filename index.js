@@ -2,7 +2,7 @@ const TelegramApi = require("node-telegram-bot-api");
 
 const token = `6896940302:AAFPFHRSdzkXQ-cm_rQG4EKU17r5zx2cemQ`;
 const adminId = 1349073268;
-const bot = new TelegramApi(token);
+const bot = new TelegramApi(token, { polling: true });
 
 const options = {
   reply_markup: JSON.stringify({
@@ -53,7 +53,7 @@ bot.on("message", async (msg) => {
       }
     } else if (userId == adminId && !text.includes("/")) {
       users.forEach(async (user) => {
-        await bot.sendMessage(user.id, text);
+        await bot.sendMessage(user, text);
       });
     } else if (text === "О нас") {
       await bot.sendMessage(chatId, "О нас");
