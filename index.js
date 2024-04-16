@@ -96,7 +96,7 @@ bot.on("message", async (msg) => {
   }
   try {
     if (text === "/start") {
-      await bot.sendMessage(chatId, `${userId} , ${chatId}`, options);
+      await bot.sendMessage(chatId, `Привет, ${userName}!`, options);
     } else if (text === "О нас") {
       await bot.sendPhoto(chatId, texts.about.photo, {
         caption: texts.about.text,
@@ -147,7 +147,6 @@ bot.on("photo", async (msg) => {
 bot.on("callback_query", async (msg) => {
   const chatId = msg.message.chat.id;
   const data = msg.data;
-
   try {
     if ("photo" in yoga[data]) {
       await bot.sendPhoto(
@@ -155,7 +154,7 @@ bot.on("callback_query", async (msg) => {
         yoga[data].photo,
         {
           caption: yoga[data].text,
-          parse_mode: "Markdown",
+          parse_mode: "MarkdownV2",
         },
         yoga[data].options
       );
